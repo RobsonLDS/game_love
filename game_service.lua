@@ -1,0 +1,1 @@
+return require("game_service.init")
