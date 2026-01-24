@@ -5,6 +5,9 @@
 -- - dispatch de mousepressed (top-most ganha)
 -- - utilitários pra limpar/pegar elementos por id
 
+-- game_service/ui/ui_manager.lua
+local shake = require("game_service.ui.shake")
+
 local UIManager = {}
 UIManager.__index = UIManager
 
@@ -104,22 +107,32 @@ end
 function UIManager:mousepressed(x, y, button)
   self:_sortIfNeeded()
 
+  -- percorre do topo (maior zIndex) pro fundo
   for i = #self.elements, 1, -1 do
     local el = self.elements[i]
-    if el.visible ~= false and el.enabled ~= false then
-      local hit = el.hitTest and el:hitTest(x, y) or false
-      if hit then
-        if el.mousepressed then
-          local consumed = el:mousepressed(x, y, button)
-          if consumed == nil then
-            -- fallback: se clicou em algo clicável, considera consumido
-            return true
-          end
-          if consumed then return true end
-        else
-          return true
-        end
+
+    if el.visible ~= false and el.enabled ~= false and el.hitTest and el:hitTest(x, y) then
+      -- ✅ clique -> pulso de shake no elemento clicado (se permitido)
+      if el.clickPulse ~= false then
+        shake.pulseShake(
+          el.id,
+          el.shakeDuration or 0.10,
+          el.shakeStrength or 4
+        )
       end
+
+      -- deixa o elemento processar clique (onClick etc)
+      if el.mousepressed and el:mousepressed(x, y, button) then
+        return true
+      end
+
+      -- ✅ mesmo sem ação, consumir clique (labels, etc)
+      if el.consumeClicks == true then
+        return true
+      end
+
+      -- fallback: se acertou hitTest, consome
+      return true
     end
   end
 

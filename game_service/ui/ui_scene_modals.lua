@@ -25,6 +25,8 @@ function M.ensureModalsUI()
   -- =========================
   local optBlocker = Blocker:new({
     id = "modal_opt_blocker",
+    clickPulse = false,   -- ✅ não treme
+    consumeClicks = true,
     alpha = 0.18,
     onClickOutside = function()
       e.ui.options.open = false
@@ -33,6 +35,7 @@ function M.ensureModalsUI()
 
   local optFrame = PanelFrame:new({
     id = "modal_opt_frame",
+    clickPulse = false,   -- ✅ não treme
     fillAlpha = 0.00, -- se quiser leve fundo: 0.06
   })
 

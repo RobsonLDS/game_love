@@ -12,9 +12,14 @@ function M.applyLocaleAllModes()
 end
 
 function M.goToMenu()
+  if e.activeMode and e.activeMode.destroyUI then
+    e.activeMode:destroyUI()
+  end
+
   e.state = "menu"
   e.activeMode = nil
 end
+
 
 function M.startMode(mode)
   e.activeMode = mode

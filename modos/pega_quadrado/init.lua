@@ -1,3 +1,8 @@
+-- dentro de um modo qualquer (ex: modos/pega_quadrado.lua)
+local Label = require("game_service.ui.label")
+local Button = require("game_service.ui.button_element")
+local e = require("estado")
+
 local Mode = {}
 Mode.__index = Mode
 
@@ -44,10 +49,53 @@ function Mode:applyLocale(i18n)
 end
 
 function Mode:reset(i18n)
-  self.player.x, self.player.y = 100, 100
-  self.score = 0
-  self.msg = i18n.t("mode_pega_msg")
-  self.target.x, self.target.y = randPos(self.target.w, self.target.h)
+  self.uiIds = {} -- ✅ sempre reinicia a lista de ids desse modo
+
+  local UIManager = require("game_service.ui.ui_manager")
+  e.ui.manager = e.ui.manager or UIManager:new()
+  local ui = e.ui.manager
+
+  -- SCORE (Label UI)
+  local scoreLbl = Label:new({
+    id = "pega_score",
+    font = e.ui.fontBody,
+    text = i18n.t("game_score") .. self.score,
+    shakeDuration = 0.10,
+    shakeStrength = 3,
+    hoverBorder = true,
+    consumeClicks = true,
+  })
+  scoreLbl:autoRect(20, 120)
+  ui:add(scoreLbl, 20)                 -- ✅ AQUI era o erro (não é e.ui:add)
+  table.insert(self.uiIds, scoreLbl.id)
+
+  -- DICA "ESC para sair" (Label UI)
+  local escLbl = Label:new({
+    id = "pega_esc_hint",
+    font = e.ui.fontBody,
+    text = i18n.t("game_back_menu"),
+    shakeDuration = 0.10,
+    shakeStrength = 3,
+    hoverBorder = true,
+    consumeClicks = true,
+  })
+  escLbl:autoRect(20, love.graphics.getHeight() - 40)
+  ui:add(escLbl, 20)
+  table.insert(self.uiIds, escLbl.id)
+
+  -- MENSAGEM DE FEEDBACK (ex: "+1 ponto")
+  local msgLbl = Label:new({
+    id = "pega_msg",
+    font = e.ui.fontBody,
+    text = "",
+    shakeDuration = 0.12,
+    shakeStrength = 4,
+    hoverBorder = true,
+    consumeClicks = true,
+  })
+  msgLbl:autoRect(20, 150)
+  ui:add(msgLbl, 20)
+  table.insert(self.uiIds, msgLbl.id)
 end
 
 function Mode:update(dt, i18n)
@@ -70,17 +118,48 @@ function Mode:update(dt, i18n)
     self.score = self.score + 1
     self.msg = i18n.t("mode_pega_plus")
     self.target.x, self.target.y = randPos(self.target.w, self.target.h)
+
+    local msgEl = e.ui.manager:get("pega_msg")
+    if msgEl then
+      msgEl:setText(self.msg)
+      msgEl:autoRect(20, 150)
+
+      -- 💥 shake automático ao mudar mensagem
+      local shake = require("game_service.ui.shake")
+      shake.pulseShake(
+        msgEl.id,
+        msgEl.shakeDuration or 0.12,
+        msgEl.shakeStrength or 4
+      )
+    end
+  end  
+  
+  -- ✅ atualiza texto do score (UI)
+  local scoreEl = e.ui.manager and e.ui.manager:get("pega_score")
+  if scoreEl then
+    scoreEl:setText(i18n.t("game_score") .. self.score)
+    scoreEl:autoRect(20, 120) -- mantém o rect do hover alinhado ao texto
+  end
+
+  -- ✅ mantém o "Esc para sair" no rodapé
+  local escEl = e.ui.manager and e.ui.manager:get("pega_esc_hint")
+  if escEl then
+    escEl:setText(i18n.t("game_back_menu"))
+    escEl:autoRect(20, love.graphics.getHeight() - 40)
   end
 end
 
 function Mode:draw(i18n)
-  love.graphics.print(i18n.t("game_score") .. self.score, 10, 10)
-  love.graphics.print(self.msg, 10, 30)
-
   love.graphics.rectangle("line", self.player.x, self.player.y, self.player.w, self.player.h)
   love.graphics.rectangle("fill", self.target.x, self.target.y, self.target.w, self.target.h)
+end
 
-  love.graphics.print(i18n.t("game_back_menu"), 10, love.graphics.getHeight() - 20)
+function Mode:destroyUI()
+  if not self.uiIds or not e.ui.manager then return end
+  for _, id in ipairs(self.uiIds) do
+    e.ui.manager:remove(id)
+  end
+  self.uiIds = {}
 end
 
 return Mode

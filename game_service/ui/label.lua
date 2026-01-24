@@ -9,6 +9,9 @@ function Label:new(o)
   o.text = o.text or ""
   o.font = o.font or love.graphics.getFont()
   o.color = o.color or { 1, 1, 1, 1 }
+  o.enabled = (o.enabled ~= false)
+  o.consumeClicks = true      -- ✅ para o click “pegar” no label também
+  o.clickPulse = true         -- ✅ default
   return o
 end
 

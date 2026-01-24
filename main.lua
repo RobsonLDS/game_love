@@ -9,11 +9,19 @@ local GameService = require("game_service")
 -- love.*
 -- =========================
 function love.load()
-  love.window.setTitle("Lua Aprendizado - LÖVE2D")
+  love.window.setTitle("Pega Quadrado")
+
+  -- ✅ carrega o ícone
+  local iconData = love.image.newImageData("assets/icon.png")
+  love.window.setIcon(iconData)
+
   love.math.setRandomSeed(os.time())
 
   e.ui.fontTitle = love.graphics.newFont(18)
   e.ui.fontBody  = love.graphics.newFont(14)
+
+  local UIManager = require("game_service.ui.ui_manager")
+  e.ui.manager = e.ui.manager or UIManager:new()
 
   -- carrega assets dos modos para aparecer no menu
   for _, m in ipairs(modes) do
@@ -55,7 +63,17 @@ function love.wheelmoved(x, y)
 end
 
 function love.mousepressed(x, y, button)
-  GameService.mousepressed(x, y, button)
+  if button ~= 1 then return end
+
+  -- ✅ UI sempre tem prioridade (menu, game, modais, tudo)
+  if e.ui.manager and e.ui.manager:mousepressed(x, y, button) then
+    return
+  end
+
+  -- ✅ se não foi consumido pela UI, passa pro modo do jogo
+  if e.state == "game" and e.activeMode and e.activeMode.mousepressed then
+    e.activeMode:mousepressed(x, y, button, i18n)
+  end
 end
 
 function love.keypressed(key)
