@@ -2,6 +2,7 @@
 local e = require("estado")
 local menuScene = require("game_service.ui.ui_scene_menu")
 local modalsScene = require("game_service.ui.ui_scene_modals")
+local globalScene = require("game_service.ui.ui_scene_global")
 local shake = require("game_service.ui.shake")
 
 local M = {}
@@ -13,18 +14,25 @@ function M.update(dt)
     if e.ui.menu.clickFlash.t < 0 then e.ui.menu.clickFlash.t = 0 end
   end
 
-  -- atualiza layout (rects) e UI hover
+  -- ✅ menu aparece só no menu (botões globais ficam)
+  menuScene.setMenuVisible(e.state == "menu")
+
+  -- ✅ layout global sempre (posição e textos dos botões)
+  globalScene.layoutGlobalUI()
+
   if e.state == "menu" then
     menuScene.layoutMenuUI()
-    modalsScene.layoutModalsUI()
-    e.ui.manager:update(dt)
   else
-    -- se quiser UI global também no game (botões/modal):
-    modalsScene.layoutModalsUI()
-    if e.ui.manager then e.ui.manager:update(dt) end
+    -- no game, só garante que menu não está visível
+    menuScene.setMenuVisible(false)
   end
 
-  -- timers do shake
+  -- modais sempre que necessário
+  modalsScene.layoutModalsUI()
+
+  -- UI hover/shake (botões globais + modais + (menu se estiver no menu))
+  if e.ui.manager then e.ui.manager:update(dt) end
+
   shake.updateShakes(dt)
 end
 

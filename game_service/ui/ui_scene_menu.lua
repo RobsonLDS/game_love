@@ -187,4 +187,26 @@ function M.layoutMenuUI()
   return ui
 end
 
+function M.setMenuVisible(on)
+  if not e.ui._menuUI or not e.ui._menuUI.created then return end
+  local ui = e.ui.manager
+  if not ui then return end
+
+  local show = (on == true)
+
+  -- labels do menu
+  local t = ui:get("menu_title"); if t then t.visible = show end
+  local h = ui:get("menu_hint");  if h then h.visible = show end
+
+  -- ✅ NÃO mexe nos botões globais (ficam sempre visíveis)
+  -- local bl = ui:get("btn_language"); if bl then bl.visible = show end
+  -- local bo = ui:get("btn_options");  if bo then bo.visible = show end
+
+  -- cards
+  for i = 1, #modes do
+    local c = ui:get("mode_" .. i)
+    if c then c.visible = show end
+  end
+end
+
 return M
