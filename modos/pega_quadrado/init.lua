@@ -23,6 +23,10 @@ function Mode.new()
     id = "pega_quadrado",
     imagePath = "assets/pega-quadrado.png", -- opcional
     image = nil,
+    
+    -- para o banco de dados
+    ended = false,
+    savedScore = false,
 
     -- estado do jogo
     player = { x = 100, y = 100, w = 30, h = 30, speed = 220 },
@@ -160,6 +164,20 @@ function Mode:destroyUI()
     e.ui.manager:remove(id)
   end
   self.uiIds = {}
+end
+
+function Mode:finish()
+  if self.ended then return end
+  self.ended = true
+
+  -- salva score UMA VEZ
+  if (not self.savedScore) and e.save and e.save.db then
+    e.save.db:insert_score(self.score)
+    self.savedScore = true
+  end
+
+  -- limpa UI do modo (se você já faz isso em outro lugar, ok manter aqui também)
+  self:destroyUI()
 end
 
 return Mode

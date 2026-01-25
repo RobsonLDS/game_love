@@ -33,11 +33,21 @@ function M.keypressed(key)
     return
   end
 
+  -- atualizado com o esc salvando no banco
   if e.state == "game" then
-    if key == "escape" then modesSvc.goToMenu() end
+    if key == "escape" then
+      -- ✅ encerra o modo atual (salva score, limpa UI, etc.)
+      if e.activeMode and e.activeMode.finish then
+        e.activeMode:finish()
+      end
+
+      -- ✅ volta pro menu
+      modesSvc.goToMenu()
+    end
   elseif e.state == "menu" then
     if key == "escape" then love.event.quit() end
   end
+
 end
 
 return M

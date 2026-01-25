@@ -5,8 +5,23 @@ local UIManager = require("game_service.ui.ui_manager")
 local e = {}
 
 e.state = "menu" -- "menu" | "game"
-
 e.activeMode = nil
+
+-- =========================
+-- SAVE / DATABASE (SQLite)
+-- =========================
+e.save = {
+  profileIndex = 1, -- padrão: profile 1
+  db = nil,         -- aqui vai a instância SaveDB.new(1)
+}
+
+-- opcional: helper pra trocar de profile depois (já deixa pronto)
+function e.setProfile(index)
+  e.save.profileIndex = index or 1
+  if e.save.db then
+    e.save.db:open(e.save.profileIndex)
+  end
+end
 
 e.ui = {
 

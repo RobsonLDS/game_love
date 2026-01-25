@@ -1,6 +1,9 @@
+package.cpath = package.cpath .. ";./libs/?.dll"
+
 local i18n = require("idiomas.i18n")
 local modes = require("modos")
 local e = require("estado")
+local SaveDB = require("save_db")
 
 local GameService = require("game_service")
 
@@ -16,6 +19,13 @@ function love.load()
   love.window.setIcon(iconData)
 
   love.math.setRandomSeed(os.time())
+
+  -- garante que existam os 3 dbs ao abrir pela primeira vez (ou qualquer vez)
+  SaveDB.bootstrap()
+
+  -- profile padrão = 1 (usa o estado)
+  e.save.profileIndex = e.save.profileIndex or 1
+  e.save.db = SaveDB.new(e.save.profileIndex)
 
   e.ui.fontTitle = love.graphics.newFont(18)
   e.ui.fontBody  = love.graphics.newFont(14)
@@ -37,6 +47,10 @@ function love.load()
   GameService.applyWindowMode()
 
   GameService.goToMenu()
+end
+
+function love.quit()
+  if e.save and e.save.db then e.save.db:close() end
 end
 
 function love.update(dt)
