@@ -15,6 +15,27 @@ local function ui()
 end
 
 function M.ensureModalsUI()
+  -- =========================
+  -- GLOBAL BUTTON: SAVES (criação única)
+  -- =========================
+  if not ui():get("btn_saves") then
+    local btnSaves = Button:new({
+      id = "btn_saves",
+      font = e.ui.fontBody,
+      label = i18n.t("btn_saves"),
+      shakeDuration = 0.10,
+      shakeStrength = 4,
+      hoverBorder = true,
+      consumeClicks = true,
+      onClick = function()
+        e.ui.saves.open = true
+        e.ui.language.open = false
+        e.ui.options.open = false
+      end
+    })
+    ui():add(btnSaves, 50)
+  end
+
   if e.ui._modalsUI and e.ui._modalsUI.created then
     return
   end
