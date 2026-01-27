@@ -2,6 +2,7 @@
 local i18n = require("idiomas.i18n")
 local e = require("estado")
 
+local SaveLua = require("save_lua")
 local Label = require("game_service.ui.label")
 local Button = require("game_service.ui.button_element")
 local Blocker = require("game_service.ui.blocker")
@@ -23,6 +24,28 @@ function M.ensureModalsUI()
   -- =========================
   -- OPTIONS MODAL
   -- =========================
+
+  local btnSaves = Button:new({
+    id = "btn_saves",
+    text = "Saves",
+    font = e.ui.fontBody,
+    w = e.ui.saves.btn.w,
+    h = e.ui.saves.btn.h,
+
+    hoverBorder = true,
+    shakeDuration = 0.10,
+    shakeStrength = 3,
+
+    consumeClicks = true,
+    onClick = function()
+      e.ui.saves.open = not e.ui.saves.open
+      e.ui.options.open = false
+      e.ui.language.open = false
+    end
+  })
+
+  ui():add(btnSaves, 90)
+
   local optBlocker = Blocker:new({
     id = "modal_opt_blocker",
     clickPulse = false,   -- ✅ não treme
@@ -216,12 +239,136 @@ function M.ensureModalsUI()
   ui():add(btnEN,       112)
   ui():add(langClose,   112)
   ui():add(langTip,     112)
+
+   -- =========================
+  -- SAVES MODAL
+  -- =========================
+  local savesBlocker = Blocker:new({
+    id = "modal_saves_blocker",
+    alpha = 0.18,
+    onClickOutside = function()
+      e.ui.saves.open = false
+    end
+  })
+
+  local savesFrame = PanelFrame:new({
+    id = "modal_saves_frame",
+    fillAlpha = 0.00,
+  })
+
+  local savesTitle = Label:new({
+    id = "modal_saves_title",
+    font = e.ui.fontTitle,
+    text = "Saves",
+    shakeStrength = 4,
+  })
+
+  local function selectProfile(idx)
+    -- troca profile (se você tiver e.setProfile no estado, use ele)
+    if e.setProfile then
+      e.setProfile(idx)
+    else
+      e.save.profileIndex = idx
+    end
+
+    -- carrega dados do profile escolhido
+    e.save.data = SaveLua.load_profile(e.save.profileIndex)
+
+    e.ui.saves.open = false
+  end
+
+  local s1 = Button:new({
+    id = "modal_save_p1",
+    font = e.ui.fontBody,
+    label = "Profile 1",
+    shakeStrength = 4,
+    hoverBorder = true,
+    consumeClicks = true,
+    onClick = function() selectProfile(1) end
+  })
+
+  local s2 = Button:new({
+    id = "modal_save_p2",
+    font = e.ui.fontBody,
+    label = "Profile 2",
+    shakeStrength = 4,
+    hoverBorder = true,
+    consumeClicks = true,
+    onClick = function() selectProfile(2) end
+  })
+
+  local s3 = Button:new({
+    id = "modal_save_p3",
+    font = e.ui.fontBody,
+    label = "Profile 3",
+    shakeStrength = 4,
+    hoverBorder = true,
+    consumeClicks = true,
+    onClick = function() selectProfile(3) end
+  })
+
+  local savesClose = Button:new({
+    id = "modal_saves_close",
+    font = e.ui.fontBody,
+    label = i18n.t("btn_close"),
+    shakeStrength = 4,
+    hoverBorder = true,
+    consumeClicks = true,
+    onClick = function()
+      e.ui.saves.open = false
+    end
+  })
+
+  local savesTip = Label:new({
+    id = "modal_saves_tip",
+    font = e.ui.fontBody,
+    text = "Escolha um profile para carregar.",
+    shakeStrength = 2,
+  })
+
+  ui():add(savesBlocker, 120)
+  ui():add(savesFrame,   121)
+  ui():add(savesTitle,   122)
+  ui():add(s1,           122)
+  ui():add(s2,           122)
+  ui():add(s3,           122)
+  ui():add(savesClose,   122)
+  ui():add(savesTip,     122)
 end
 
 function M.layoutModalsUI()
   M.ensureModalsUI()
 
   local sw, sh = love.graphics.getWidth(), love.graphics.getHeight()
+
+  -- ======= TOP BUTTONS (SAVES)
+  do
+    local b = ui():get("btn_saves")
+    if b then
+      -- posiciona ao lado dos outros botões (canto superior direito)
+      -- ajuste se você já tem coordenadas fixas para options/language
+      local w, h = e.ui.saves.btn.w, e.ui.saves.btn.h
+      local margin = 16
+      local gap = 10
+
+      -- Se você já tem btn_language e btn_options, alinha em fila:
+      local bx = sw - margin - w
+      local by = margin
+
+      -- tenta colocar à esquerda do botão de language, se existir
+      local langBtn = ui():get("btn_language")
+      if langBtn and langBtn.x then
+        bx = (langBtn.x - gap - w)
+        by = langBtn.y or by
+      end
+
+      b:setRect(bx, by, w, h)
+
+      -- mostra profile atual no texto (opcional e legal)
+      local pi = (e.save and e.save.profileIndex) or 1
+      b.label = "Saves (" .. tostring(pi) .. ")"
+    end
+  end
 
   -- ======= OPTIONS
   local optOpen = e.ui.options.open == true
@@ -355,6 +502,66 @@ function M.layoutModalsUI()
     tip:setText(i18n.t("lang_tip"))
     tip:autoRect(lp.x + 16, lp.y + lp.h - 28)
   end
+
+    -- ======= SAVES
+  local savesOpen = e.ui.saves.open == true
+  local sp = e.ui.saves.panel
+
+  ui():get("modal_saves_blocker").visible = savesOpen
+  ui():get("modal_saves_frame").visible   = savesOpen
+  ui():get("modal_saves_title").visible   = savesOpen
+  ui():get("modal_save_p1").visible       = savesOpen
+  ui():get("modal_save_p2").visible       = savesOpen
+  ui():get("modal_save_p3").visible       = savesOpen
+  ui():get("modal_saves_close").visible   = savesOpen
+  ui():get("modal_saves_tip").visible     = savesOpen
+
+  if savesOpen then
+    local b = ui():get("modal_saves_blocker")
+    b:setRect(0, 0, sw, sh)
+    b.panelRect = { x = sp.x, y = sp.y, w = sp.w, h = sp.h }
+
+    ui():get("modal_saves_frame"):setRect(sp.x, sp.y, sp.w, sp.h)
+
+    local title = ui():get("modal_saves_title")
+    title.font = e.ui.fontTitle
+    title:setText("Saves")
+    title:autoRect(sp.x + 16, sp.y + 12)
+
+    local btnW, btnH = sp.w - 32, 38
+    local x = sp.x + 16
+    local y1 = sp.y + 58
+    local y2 = y1 + 48
+    local y3 = y2 + 48
+
+    local pi = (e.save and e.save.profileIndex) or 1
+
+    local p1 = ui():get("modal_save_p1")
+    p1.font = e.ui.fontBody
+    p1.label = ((pi == 1) and "* " or "") .. "Profile 1"
+    p1:setRect(x, y1, btnW, btnH)
+
+    local p2 = ui():get("modal_save_p2")
+    p2.font = e.ui.fontBody
+    p2.label = ((pi == 2) and "* " or "") .. "Profile 2"
+    p2:setRect(x, y2, btnW, btnH)
+
+    local p3 = ui():get("modal_save_p3")
+    p3.font = e.ui.fontBody
+    p3.label = ((pi == 3) and "* " or "") .. "Profile 3"
+    p3:setRect(x, y3, btnW, btnH)
+
+    local close = ui():get("modal_saves_close")
+    close.font = e.ui.fontBody
+    close.label = i18n.t("btn_close")
+    close:setRect(sp.x + sp.w - 120 - 16, sp.y + sp.h - 34 - 16, 120, 34)
+
+    local tip = ui():get("modal_saves_tip")
+    tip.font = e.ui.fontBody
+    tip:setText("Escolha um profile para carregar.")
+    tip:autoRect(sp.x + 16, sp.y + sp.h - 28)
+  end
+
 end
 
 return M

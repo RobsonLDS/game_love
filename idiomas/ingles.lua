@@ -1,3 +1,4 @@
+-- idiomas/ingles.lua
 return {
   -- Menu
   menu_title = "Game Modes",
@@ -6,6 +7,7 @@ return {
   -- Global buttons
   btn_options = "OPTIONS",
   btn_language = "LANGUAGE",
+  btn_saves = "SAVES",
 
   -- Options
   options_title = "Options",
@@ -38,4 +40,11 @@ return {
   mode_pega_desc  = "Move the big square (WASD/Arrows) and touch the small square to score points. Press ESC to return to the menu.",
   mode_pega_msg   = "Catch the square!",
   mode_pega_plus  = "Nice! +1 point",
+
+  -- Saves (modal)
+  saves_title = "Saves",
+  saves_profile_1 = "Profile 1",
+  saves_profile_2 = "Profile 2",
+  saves_profile_3 = "Profile 3",
+  saves_tip = "Tip: click outside the panel to close",
 }

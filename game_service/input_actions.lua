@@ -32,6 +32,10 @@ function M.keypressed(key)
     if key == "escape" then e.ui.language.open = false end
     return
   end
+  if e.ui.saves.open then
+    if key == "escape" then e.ui.saves.open = false end
+    return
+  end
 
   -- atualizado com o esc salvando no banco
   if e.state == "game" then

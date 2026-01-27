@@ -1,3 +1,4 @@
+-- estado.lua
 -- =========================
 -- Estado
 -- =========================
@@ -62,11 +63,17 @@ e.ui = {
     btn = { x=0,y=0,w=150,h=36 },
     panel = { x=0,y=0,w=360,h=190 },
     items = {},
-  }
+  },
+  saves = {
+    open = false,
+    btn = { x=0,y=0,w=120,h=36 },
+    panel = { x=0,y=0,w=360,h=220 },
+    items = {},
+  },
 }
 
 function e.isAnyModalOpen()
-  return e.ui.options.open or e.ui.language.open
+  return e.ui.options.open or e.ui.language.open or e.ui.saves.open
 end
 
 return e

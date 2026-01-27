@@ -52,6 +52,21 @@ function M.ensureMenuUI()
   -- =========
   -- Botões globais
   -- =========
+  local btnSaves = Button:new({
+    id = "btn_saves",
+    font = e.ui.fontBody,
+    label = "Saves",
+    shakeDuration = 0.10,
+    shakeStrength = 4,
+    hoverBorder = true,
+    consumeClicks = true,
+    onClick = function()
+      e.ui.saves.open = true
+      e.ui.language.open = false
+      e.ui.options.open = false
+    end
+  })
+
   local btnLang = Button:new({
     id = "btn_language",
     font = e.ui.fontBody,
@@ -60,6 +75,8 @@ function M.ensureMenuUI()
     shakeStrength = 4,
     onClick = function()
       e.ui.language.open = true
+      e.ui.options.open = false
+      e.ui.saves.open = false
     end
   })
 
@@ -71,9 +88,12 @@ function M.ensureMenuUI()
     shakeStrength = 4,
     onClick = function()
       e.ui.options.open = true
+      e.ui.language.open = false
+      e.ui.saves.open = false
     end
   })
 
+  ui:add(btnSaves, 50)
   ui:add(btnLang, 50)
   ui:add(btnOpt, 50)
 
@@ -129,6 +149,14 @@ function M.layoutMenuUI()
     btnLang.font = e.ui.fontBody
     btnLang.label = i18n.t("btn_language")
     btnLang:setRect(e.ui.language.btn.x, e.ui.language.btn.y, e.ui.language.btn.w, e.ui.language.btn.h)
+  end
+
+  local btnSaves = ui:get("btn_saves")
+  if btnSaves then
+    btnSaves.font = e.ui.fontBody
+    local pi = (e.save and e.save.profileIndex) or 1
+    btnSaves.label = i18n.t("btn_saves") .. " (" .. tostring(pi) .. ")"
+    btnSaves:setRect(e.ui.saves.btn.x, e.ui.saves.btn.y, e.ui.saves.btn.w, e.ui.saves.btn.h)
   end
 
   local btnOpt = ui:get("btn_options")

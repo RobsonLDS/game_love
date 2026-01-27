@@ -1,3 +1,4 @@
+-- idiomas/portugues.lua
 return {
   -- Menu
   menu_title = "Seleção de Modos",
@@ -6,6 +7,7 @@ return {
   -- Botões globais
   btn_options = "OPÇÕES",
   btn_language = "IDIOMA",
+  btn_saves = "SAVES", -- ou "SALVAMENTOS"
 
   -- Opções
   options_title = "Opções",
@@ -38,4 +40,10 @@ return {
   mode_pega_desc  = "Mova o quadrado grande (WASD/Setas) e encoste no quadrado pequeno para ganhar pontos. Aperte ESC para voltar ao menu.",
   mode_pega_msg   = "Pegue o quadrado!",
   mode_pega_plus  = "Boa! +1 ponto",
+
+  saves_title = "Saves",
+  saves_profile_1 = "Perfil 1",
+  saves_profile_2 = "Perfil 2",
+  saves_profile_3 = "Perfil 3",
+  saves_tip = "Dica: clique fora do painel para fechar",
 }

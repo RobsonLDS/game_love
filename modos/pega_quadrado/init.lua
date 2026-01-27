@@ -1,4 +1,4 @@
--- dentro de um modo qualquer (ex: modos/pega_quadrado.lua)
+-- modos/pega_quadrado/init.lua
 local Label = require("game_service.ui.label")
 local Button = require("game_service.ui.button_element")
 local e = require("estado")
