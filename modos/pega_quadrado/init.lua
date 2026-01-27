@@ -2,6 +2,7 @@
 local Label = require("game_service.ui.label")
 local Button = require("game_service.ui.button_element")
 local e = require("estado")
+local SaveLua = require("save_lua")
 
 local Mode = {}
 Mode.__index = Mode
@@ -171,10 +172,13 @@ function Mode:finish()
   self.ended = true
 
   -- salva score UMA VEZ
-  if (not self.savedScore) and e.save and e.save.db then
-    e.save.db:insert_score(self.score)
-    self.savedScore = true
-  end
+  --if (not self.savedScore) and e.save and e.save.db then
+  --  e.save.db:insert_score(self.score)
+  --  self.savedScore = true
+  --end
+
+  -- salva score no arquivo do profile atual
+  SaveLua.insert_score(e.save.profileIndex, self.score)
 
   -- limpa UI do modo (se você já faz isso em outro lugar, ok manter aqui também)
   self:destroyUI()
