@@ -1,3 +1,4 @@
+-- main.lua
 package.cpath = package.cpath .. ";./libs/?.dll"
 
 local i18n = require("idiomas.i18n")

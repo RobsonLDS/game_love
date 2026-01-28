@@ -7,7 +7,7 @@ local M = {}
 
 function M.applyLocaleAllModes()
   for _, m in ipairs(modes) do
-    if m.applyLocale then m:applyLocale(i18n) end
+    if m.aplicar_texto then m:aplicar_texto(i18n) end
   end
 end
 

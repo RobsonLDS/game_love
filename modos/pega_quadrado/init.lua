@@ -19,6 +19,7 @@ local function rectsOverlap(a, b)
          b.y < a.y + a.h
 end
 
+-- Construtor da Classe
 function Mode.new()
   return setmetatable({
     id = "pega_quadrado",
@@ -35,7 +36,7 @@ function Mode.new()
     score = 0,
     msg = "",
 
-    -- textos (preenchidos pelo applyLocale)
+    -- textos (preenchidos pelo aplicar_texto ao modulo)
     title = "",
     description = "",
   }, Mode)
@@ -47,8 +48,8 @@ function Mode:loadAssets()
   end
 end
 
--- i18n é passado pelo main (injetado)
-function Mode:applyLocale(i18n)
+-- i18n é passado pelo main (injetado) applyLocale
+function Mode:aplicar_texto(i18n)
   self.title = i18n.t("mode_pega_title")
   self.description = i18n.t("mode_pega_desc")
 end
